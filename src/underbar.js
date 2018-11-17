@@ -81,16 +81,57 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
+    var results = [];
+    _.each(collection, function(cur, index, array){
+      if (test(cur)){
+        results.push(cur);
+      }
+    })
+    return results;
   };
+
+  //[1,2,3,4]
+  //var arr = [1,2,3,4].filter(function(currentValue, index, array){
+//  return currentValue === 2;
+  //})
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+    var results = [];
+    results = _.filter(collection, function(cur){
+      return test(cur) === false;
+    })
+    return results;
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
+
+    if (isSorted && iterator){
+      var outputs = [];
+      var unique = [];
+      for(var i = 0; i < array.length; i++){
+        if(!outputs.includes(iterator(array[i]))){
+          outputs.push(iterator(array[i]));
+          unique.push(array[i]);
+        }
+      }
+      return unique;
+    }
+
+    var sorted = array.sort()
+    var checkpoint = sorted[0];
+    var result = [sorted[0]];
+    for(var i = 0; i < (sorted.length - 1); i++){
+      if(checkpoint !== sorted[i + 1]){
+        result.push(sorted[i + 1]);
+        checkpoint = sorted[i + 1]
+      }
+    }
+    return result;
+
   };
 
 
@@ -99,6 +140,12 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    var results = [];
+    _.each(collection, function(cur, index, array){
+      results.push(iterator(cur));
+    })
+    return results;
+
   };
 
   /*
@@ -118,6 +165,7 @@
       return item[key];
     });
   };
+
 
   // Reduces an array or object to a single value by repetitively calling
   // iterator(accumulator, item) for each item. accumulator should be
@@ -139,7 +187,28 @@
   //     return total + number * number;
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
-  _.reduce = function(collection, iterator, accumulator) {
+
+
+  _.reduce = function(collection, iterator, accumulator) { //[1, 2, 3], function, 10
+
+    if (accumulator === undefined){
+      accumulator = collection[0];
+      collection = collection.slice(1);
+      //result = accumulator;
+      _.each(collection, function(cur, index, array){
+       // if(array[index + 1]){
+        accumulator = iterator(accumulator, cur, index, array);
+        //}
+      })
+    } else {
+
+      //result = accumulator;
+    _.each(collection, function(cur, index, array){ // [1,2,3], 1 , 0, []
+      accumulator = iterator(accumulator, cur, index, array); // 10, 1
+      })
+    }
+
+    return accumulator;
   };
 
   // Determine if the array or object contains a given value (using `===`).
